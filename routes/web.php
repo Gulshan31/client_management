@@ -22,3 +22,7 @@ Route::get('/admin/dashboard',[DashboardController::class,'index'])->name('dashb
 Route::get('/admin/project',[ProjectController::class,'index'])->name('project');
 Route::get('/admin/project/add',[ProjectController::class,'add'])->name('add-project');
 Route::post('/admin/project/create',[ProjectController::class,'store'])->name('create-project');
+Route::get('/admin/download/{id}',[ProjectController::class,'downloadFiles'])->name('files-download');
+Route::get('/admin/download/pdf/{id}',[ProjectController::class,'downloadPDF'])->name('download-pdf');
+Route::get('/edit/{id}',[ProjectController::class,'returnEditView'])->name('edit-project');
+Route::post('/update/{id}',[ProjectController::class,'update'])->name('update-project');

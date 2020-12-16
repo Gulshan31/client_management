@@ -5,7 +5,7 @@
     <div class="row mb-2 justify-content-between pl-1 pr-1 align-items-center">
         <div>
             <h1 class="a_dash d-inline-block p-0 m-0">
-                Projects <small><span class="color-secondary">|</span> Add</small>
+                Projects <small><span class="color-secondary">|</span> Edit</small>
             </h1>
         </div>
         <div class="mt-1 mt-sm-0">
@@ -27,15 +27,18 @@
     @endif
     <div class="card theme_set">
         <div class="card-body">
-            <form class="row" action="{{ route('create-project') }}" method="post" enctype="multipart/form-data">
+            <form class="row" action="{{ route('update-project',$project->id) }}" method="post" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" value="" id="client_id" name="client_id">
                 <div class="form-group col-sm-6">
                     <label for="client">Select Client:</label>
-                    <select class="form-control @error('client_name') is-invalid @enderror" id="client" name="client_name" onchange="generateProjectCode(this.value)" value="{{ old('client_name') }}">
+                    <select class="form-control @error('client_name') is-invalid @enderror" id="client" name="client_name" value="{{ old('client_name') }}">
                         <option value="">Select Client</option>
                         @foreach ($clients as $client)
-                        <option value="{{$client->id}}-{{$client->client_code}}-{{$client->no_of_projects}}">{{$client->name}}</option>
+                            @if($client->id == $project->client_id)
+                                <option selected value="{{$client->id}}">{{$client->name}}</option>
+                            @else
+                                <option value="{{$client->id}}">{{$client->name}}</option>
+                            @endif    
                         @endforeach
                     </select>
                     @error('client_name')
@@ -44,7 +47,7 @@
                 </div>
                 <div class="pb-1 form-group col-sm-6">
                     <label for="project-code"> Project Code:</label>
-                    <input class="form-control" required value="" type="text" placeholder="auto generated when you select client" id="project-code" readonly name="project_code">
+                    <input class="form-control" type="text" value="{{$project->project_code}}" id="project-code" readonly name="project_code">
                 </div>
                 <div class="form-group col-sm-6">
                     <label for="main-services">Select Main Service:</label>
@@ -93,11 +96,11 @@
                 </div>
                 <div class="pb-1 form-group col-sm-6">
                     <label> Number of Renderings:</label>
-                    <input class="form-control" name="renders" value="" type="number">
+                    <input class="form-control" name="renders" value="{{$project->no_of_renders}}" type="number">
                 </div>
                 <div class="pb-1 form-group col-sm-6">
                     <label> Assign To:</label>
-                    <input class="form-control @error('assign_to') is-invalid @enderror" name="assign" value="" required type="text">
+                    <input class="form-control @error('assign_to') is-invalid @enderror" name="assign" value="{{$project->assign_to}}" required type="text">
                     @error('assign_to')
                     <span class="invalid-feedback" role="alert">{{ $message }}</span>
                     @enderror
@@ -105,10 +108,10 @@
                 <div class="form-group col-sm-6">
                     <label for="main-section">Select Status:</label>
                     <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" value="{{ old('status') }}">
-                    <option value="1">Active</option>
-                    <option value="2">On Hold</option>
-                    <option value="3">In Review</option>
-                    <option value="4">Completed</option>
+                        <option value="1">Active</option>
+                        <option value="2">On Hold</option>
+                        <option value="3">In Review</option>
+                        <option value="4">Completed</option>
                     </select>
                     @error('status')
                     <span class="invalid-feedback" role="alert">{{ $message }}</span>
@@ -116,43 +119,27 @@
                 </div>
                 <div class="form-group col-sm-6">
                     <label for="start_date">Start Date:</label>
-                    <input type="date" class="form-control" required name="start_date">
+                    <input type="date" class="form-control" value="{{date($project->start_date)}}" required name="start_date">
                 </div>
                 <div class="form-group col-sm-6">
                     <label for="end_date">End Date:</label>
-                    <input type="date" class="form-control" required name="end_date">
+                    <input type="date" class="form-control" value="{{$project->end_date}}" required name="end_date">
                 </div>
                 <div class="pb-1 form-group col-12">
                     <label> Google Drive Link:</label>
-                    <input class="form-control" name="g_drive" value="" type="text">
+                    <input class="form-control" name="g_drive" value="{{$project->g_drive}}" type="text">
                 </div>
                 <div class="form-group col-12">
                     <input class="form-control" name="docs[]" value="" type="file" multiple>
                 </div>
                 <div class="p-1">
-                    <button type="submit" class="btn btn-dark">Submit</button>
+                    <button type="submit" class="btn btn-dark">Update</button>
                 </div>
             </form>            
         </div>
     </div>
 </div>
 <script>
-    function generateProjectCode(context){
-        let c = context.split('-')
-        // First Id, Client Code, Number of projects
-        // Generate project code
-        let id = Number(c[0])
-        let clientCode = c[1]
-        let numberOfProjects = Number(c[2])+1;
-        let projectCode = clientCode+'-00'+numberOfProjects
-        document.getElementById('client_id').value = id;
-        if(isNaN(numberOfProjects)){
-            document.getElementById('project-code').value='';
-        }
-        else{
-            document.getElementById('project-code').value = projectCode;
-        }
-    }
     function loadMainSection(id){
         let display=`<option value="">select main section</option>`;
         $.ajax({
