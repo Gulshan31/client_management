@@ -54,6 +54,7 @@
     </style>
   </head>
   <body class="body">
+  @foreach($projects as $project)
   	<table width="550" border="0" cellspacing="0" cellpadding="0" bgcolor="#fff" class="mobile-shell">
   		<tr>
   			<td align="center" valign="top" style="padding:0 0;">
@@ -170,6 +171,8 @@
           		<p style="color: #fff; padding:0 10px 10px 0; margin: 0; text-align: right;"> <b>Print Date:</b> {{date('Y-m-d')}}</p>
           	</td>
          </tr> 
-    </table>     	
+    </table> 
+	<div class="page-break"></div>
+	@endforeach    	
   </body>
 </html>

@@ -49,20 +49,21 @@ class ProjectController extends Controller
     }
     public function downloadPDF($id)
     {
-        // return view('pdf');
-        $this->data['project'] = ProjectInfo::whereId($id)->get()->first();
+        $this->data['project'] = ProjectInfo::with(['clients','services','main_sections','sub_sections'])->whereId($id)->get()->first();
         $spe_ids = explode(',',$this->data['project']->specification);
         $temp_specification = Specifications::whereIn('id',$spe_ids)->get();
-        $temp_groups = [];
-        foreach($temp_specification as $temp){
-            if(!in_array($temp->group,$temp_groups)){
-                array_push($temp_groups,$temp->group);
-                $group[$temp->group] = [];
-            }
-            array_push($group[$temp->group],$temp);
-        }
-        $this->data['specifications'] = $group;
-        $pdf = PDF::loadView('pdf', compact('data'));
+        // $temp_groups = [];
+        // $group = [];
+        // foreach($temp_specification as $temp){
+        //     if(!in_array($temp->group,$temp_groups)){
+        //         array_push($temp_groups,$temp->group);
+        //         $group[$temp->group] = [];
+        //     }
+        //     array_push($group[$temp->group],$temp);
+        // }
+        $this->data['specifications'] = $temp_specification;
+        // return view('pdf')->with($this->data);
+        $pdf = PDF::loadView('pdf',$this->data);
         return $pdf->download('project.pdf');
     }
     public function getOptionsAndList($id)
@@ -138,7 +139,56 @@ class ProjectController extends Controller
     }
     public function update(Request $request,$id)
     {
-        # code...
+        $validator = Validator::make($request->all(), [
+            'client_name'=>'required',
+            'main_service'=>'required',
+            'main_section'=>'required',
+            'sub_section'=>'required',
+         ]);
+         if ($validator->fails()) { 
+             return redirect()->back()->withErrors($validator)->withInput();
+         }
+         $specifications = [];
+         if($request->has('Exteriors')){
+             foreach($request['Exteriors'] as $spe)
+             {
+                 array_push($specifications,$spe);
+             }
+         }
+         if($request->has('Interiors')){
+             foreach($request['Interiors'] as $spe)
+             {
+                 array_push($specifications,$spe);
+             }
+         }
+         $file_list=[];
+         if($request->hasFile('docs')){
+             $files = $request->file('docs');
+             foreach($files as $f){
+                 $name = $f->getClientOriginalName();
+                 $f->move(public_path('uploads'),$name);
+                 array_push($file_list,$name);
+             }
+         }
+         if(count($file_list)){
+            $data['files'] = implode(',',$file_list);
+         }
+         $quality_list = $request->quality_list;
+         $service_type = $request->service_type;
+         $main_section = $request->main_section?$request->main_section:NULL;
+        //  Clients::where('id',$request->client_id)->increment('no_of_projects',1);
+         $data = [
+            'project_code'=>$request->project_code,
+            'client_id'=>$request->client_id,
+            'g_drive'=>$request->g_drive,
+            'assign_to'=>$request->assign_to,
+            'start_date'=>$request->start_date,
+            'end_date'=>$request->end_date,
+            'status'=>$request->status,
+            'no_of_renders'=>$request->renders
+         ];
+         ProjectInfo::whereId($id)->update($data);
+         return redirect('/admin/project')->with('success', 'Project updated successfully.');
     }
     public function downloadFiles($id)
     {
