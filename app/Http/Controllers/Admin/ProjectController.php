@@ -66,6 +66,32 @@ class ProjectController extends Controller
         $pdf = PDF::loadView('pdf',$this->data);
         return $pdf->download('project.pdf');
     }
+    public function downloadAll(Request $request)
+    {
+        // $this->data['projects']
+         $projects = ProjectInfo::where('status',$request->status)->with(['clients','services','main_sections','sub_sections'])->get();
+         if(!count($projects)){
+            return redirect('/admin/project')->with('error', 'No files for this status.');
+         }
+        foreach($projects as $project){
+            $spe_ids = explode(',',$project->specification);
+            $project['specifications'] = Specifications::whereIn('id',$spe_ids)->get();
+        }
+        // $temp_groups = [];
+        // $group = [];
+        // foreach($temp_specification as $temp){
+        //     if(!in_array($temp->group,$temp_groups)){
+        //         array_push($temp_groups,$temp->group);
+        //         $group[$temp->group] = [];
+        //     }
+        //     array_push($group[$temp->group],$temp);
+        // }
+        // $this->data['specifications'] = $temp_specification;
+        // return view('pdf')->with($this->data);
+        $this->data['projects'] = $projects;
+        $pdf = PDF::loadView('admin.combined-pdf',$this->data);
+        return $pdf->download('allproject.pdf');
+    }
     public function getOptionsAndList($id)
     {
         # code...
@@ -134,7 +160,10 @@ class ProjectController extends Controller
     {
         $this->data['clients'] = Clients::get();
         $this->data['services'] = MainServices::get();
-        $this->data['project'] = ProjectInfo::whereId($id)->with(['clients','services','main_sections','sub_sections'])->get()->first();
+        $this->data['project'] = ProjectInfo::whereId($id)->with(['clients'])->get()->first();
+        $this->data['main_sections'] = MainSections::where('main_services_id',$this->data['project']->main_service)->get();
+        $this->data['sub_sections'] = SubSections::where('main_section_id',$this->data['project']->main_section)->get();
+        $this->data['status'] = ['Active','On Hold','Review','Completed'];
         return view('admin.edit')->with($this->data);
     }
     public function update(Request $request,$id)

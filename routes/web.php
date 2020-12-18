@@ -26,3 +26,4 @@ Route::get('/admin/download/{id}',[ProjectController::class,'downloadFiles'])->n
 Route::get('/admin/download/pdf/{id}',[ProjectController::class,'downloadPDF'])->name('download-pdf');
 Route::get('/edit/{id}',[ProjectController::class,'returnEditView'])->name('edit-project');
 Route::post('/update/{id}',[ProjectController::class,'update'])->name('update-project');
+Route::post('/download/all',[ProjectController::class,'downloadAll'])->name('download-all');

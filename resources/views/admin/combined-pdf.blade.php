@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{{$project->clients->client_code}} Document | Biorev </title>
+    <title> Project Documents | Biorev </title>
     <style>
       .primary{background:#f5564e}
       .bg_white{background:#fff}
@@ -116,7 +116,7 @@
 				                  		<td>
 				                  			<h3> SPECIFICATIONS</h3>
 				                  			<ul>
-												@foreach($specifications as $spe)
+												@foreach($project->specifications as $spe)
 				                  					<li>{{$spe->name}}</li>
 												@endforeach	
 											</ul>

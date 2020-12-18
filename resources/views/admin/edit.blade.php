@@ -29,6 +29,7 @@
         <div class="card-body">
             <form class="row" action="{{ route('update-project',$project->id) }}" method="post" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" value="{{$project->client_id}}" name="client_id">
                 <div class="form-group col-sm-6">
                     <label for="client">Select Client:</label>
                     <select class="form-control @error('client_name') is-invalid @enderror" id="client" name="client_name" value="{{ old('client_name') }}">
@@ -52,9 +53,13 @@
                 <div class="form-group col-sm-6">
                     <label for="main-services">Select Main Service:</label>
                     <select class="form-control @error('main_service') is-invalid @enderror" id="main-services" name="main_service" value="{{ old('main_service') }}" onchange="loadMainSection(this.value)">
-                        <option value="0">Select Service</option>
+                        <option value="0">No service Added</option>
                         @foreach($services as $service)
-                            <option value="{{$service->id}}">{{$service->name}}</option>
+                            @if($service->id ==$project->main_service)
+                            <option selected value="{{$service->id}}">{{$service->name}}</option>
+                            @else
+                            <option  value="{{$service->id}}">{{$service->name}}</option>
+                            @endif
                         @endforeach    
                     </select>
                     @error('main_service')
@@ -64,7 +69,13 @@
                 <div class="form-group col-sm-6">
                     <label for="main-section">Select Main Section:</label>
                     <select class="form-control @error('main_section') is-invalid @enderror" id="main-section" name="main_section" value="{{ old('main_section') }}" onchange="loadSubSection(this.value)">
-
+                        @foreach($main_sections as $section)
+                            @if($section->id == $project->main_section)
+                                <option selected value="{{$section->id}}">{{$section->name}}</option>
+                            @else
+                                <option  value="{{$section->id}}">{{$section->name}}</option>
+                            @endif
+                        @endforeach
                     </select>
                     @error('main_section')
                     <span class="invalid-feedback" role="alert">{{ $message }}</span>
@@ -76,7 +87,13 @@
                 <div class="form-group col-sm-6">
                     <label for="main-section">Select Sub Section:</label>
                     <select class="form-control @error('sub_section') is-invalid @enderror" id="sub-section" name="sub_section" onchange="loadListAndQuality(this.value)">
-
+                        @foreach($sub_sections as $sub_section)
+                            @if($sub_section->id == $project->sub_section)
+                                <option selected value="{{$sub_section->id}}">{{$sub_section->name}}</option>
+                            @else
+                                <option value="{{$sub_section->id}}">{{$sub_section->name}}</option>
+                            @endif
+                        @endforeach
                     </select>
                     @error('sub_section')
                     <span class="invalid-feedback" role="alert">{{ $message }}</span>
@@ -100,7 +117,7 @@
                 </div>
                 <div class="pb-1 form-group col-sm-6">
                     <label> Assign To:</label>
-                    <input class="form-control @error('assign_to') is-invalid @enderror" name="assign" value="{{$project->assign_to}}" required type="text">
+                    <input class="form-control @error('assign_to') is-invalid @enderror" name="assign_to" value="{{$project->assign_to}}" required type="text">
                     @error('assign_to')
                     <span class="invalid-feedback" role="alert">{{ $message }}</span>
                     @enderror
@@ -108,10 +125,13 @@
                 <div class="form-group col-sm-6">
                     <label for="main-section">Select Status:</label>
                     <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" value="{{ old('status') }}">
-                        <option value="1">Active</option>
-                        <option value="2">On Hold</option>
-                        <option value="3">In Review</option>
-                        <option value="4">Completed</option>
+                        @foreach($status as $key=>$st)
+                        @if($project->status == $st)
+                            <option selected value="{{$st}}">{{$st}}</option>
+                        @else    
+                            <option value="{{$st}}">{{$st}}</option>
+                        @endif
+                        @endforeach
                     </select>
                     @error('status')
                     <span class="invalid-feedback" role="alert">{{ $message }}</span>

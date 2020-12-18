@@ -15,6 +15,28 @@
     <div class="clearfix"></div>
 
     <div class="card mb-4">
+        <div class="card-header">
+            <form action="{{route('download-all')}}" method="post">
+                @csrf
+                <div class="row">
+                    <div class="form-group col-sm-6">
+                        <label for="main-section">Select Status:</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="Active">Active</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="In Review">In Review</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        @error('status')
+                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class=" form-group col-sm-6">
+                        <button tppe="submit" class="add_button ml-1"><i class="fas fa-download position-relative"></i> Download</a>
+                    </div>
+                </div> 
+            </form>
+        </div>
         <div class="card-body">
             <div class="table-responsive" id="custom_table">
                 @if(\Session::has('success'))
